@@ -1,0 +1,115 @@
+plugins {
+    id 'org.springframework.boot' version '2.2.5.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+    id 'application'
+    id 'org.flywaydb.flyway' version '6.3.1'
+    id "io.freefair.lombok" version "5.3.0"
+    id 'jacoco'
+    id 'idea'
+}
+
+group 'com.quartz.scheduler'
+version '1.0-SNAPSHOT'
+mainClassName = 'com.quartz.scheduler.SpringBootQuartzApp'
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility='1.8'
+targetCompatibility='1.8'
+
+dependencies {
+    def junitVersion = "5.5.2"
+    def postgresDriverVersion = "42.2.11"
+    def quartzVersion = "2.2.3"
+    def swaggerSpringDoc = "1.2.32"
+    def jaxbApiVersion = "2.3.1"
+    def jodaTimeVersion = "2.9.4"
+
+    implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework:spring-context-support"
+    implementation "org.postgresql:postgresql:$postgresDriverVersion"
+    implementation (group: 'org.quartz-scheduler', name: 'quartz', version: "$quartzVersion")
+    implementation (group: 'org.quartz-scheduler', name: 'quartz-jobs', version: "$quartzVersion")
+    implementation (group: 'joda-time', name: 'joda-time', version: "$jodaTimeVersion")
+    implementation (group: 'javax.xml.bind', name: 'jaxb-api', version: "$jaxbApiVersion")
+    implementation (group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "$swaggerSpringDoc")
+
+
+
+
+
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+        exclude module: 'junit'
+    }
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testImplementation 'org.mockito:mockito-inline:2.13.0'
+}
+
+dependencyManagement {
+
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': mainClassName
+        )
+    }
+}
+
+test {
+    useJUnitPlatform()
+    reports.html.enabled = false
+    testLogging {
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
+    afterSuite { desc, result ->
+        if (!desc.parent) {
+            println "\nTest result: ${result.resultType}"
+            println "Test summary: ${result.testCount} tests, " +
+                    "${result.successfulTestCount} succeeded, " +
+                    "${result.failedTestCount} failed, " +
+                    "${result.skippedTestCount} skipped"
+        }
+    }
+}
+
+flyway {
+    def host = System.getenv("DB_HOST") ?: "localhost"
+    def databaseName = System.getenv("DB_NAME") ?: "scheduledemo"
+
+    url = "jdbc:postgresql://$host/$databaseName"
+    user = System.getenv("DB_USERNAME") ?: "postgres"
+    password = System.getenv("DB_PASSWORD") ?: "postgres"
+    locations = ["filesystem:src/main/resources/db/migration"]
+}
+
+task start(type: JavaExec) {
+    classpath = files('build/libs/spring-boot-quartz-scheduler-1.0-SNAPSHOT.jar')
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.setEnabled true
+        html.destination = file("$buildDir/reports/coverage")
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.0
+            }
+        }
+    }
+}
