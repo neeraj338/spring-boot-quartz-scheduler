@@ -6,7 +6,7 @@
         :key="n"
         :complete="stepComplete(n + 1)"
         :step="n + 1"
-        :rules="[value => !!step.valid]"
+        :rules="[(value) => !!step.valid]"
         :color="stepStatus(n + 1)"
       >
         {{ step.name }}
@@ -137,56 +137,70 @@
             </template>
             <!-- job data  -->
             <template v-if="n == 2">
-              <v-container>
-                <v-row>
-                  <v-col cols="6" md="2" sm="2">
-                    <v-select
-                      item-text="name"
-                      item-value="last"
-                      :items="httpMethods"
-                      v-model="formField.httpMethod"
-                      label="Http Method"
-                      @change="assignHttpMethodOnChange"
-                      outlined
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="12" md="6" sm="6">
-                    <v-text-field
-                      v-model="formField.url"
-                      label="Url"
-                      :rules="step.rules"
-                      outlined
-                      required
-                    ></v-text-field
-                  ></v-col>
-                  <div v-if="formField.httpMethod !== 'GET'">
-                    <div
-                      class="static"
-                      v-bind:class="{ active: true, 'text-danger': true }"
-                      v-if="formField.jsonstr && jsonerror"
-                    >
-                      ❌ {{ jsonerror }}
-                    </div>
-                    <div
-                      v-bind:class="{ 'text-success': true }"
-                      v-if="!jsonerror"
-                    >
-                      Valid JSON ✔
-                    </div>
-                    <v-textarea
-                      background-color="amber lighten-4"
-                      color="orange orange-darken-4"
-                      no-resize
-                      rows="4"
-                      label="JSON"
-                      v-model="formField.jsonstr"
-                      ref="jsonText"
-                      placeholder="paste or type JSON here..."
-                      @change="prettyFormat(n)"
-                    ></v-textarea>
-                  </div>
-                </v-row>
-              </v-container>
+              <v-layout>
+                <v-flex
+                  ><v-card color="grey lighten-1" class="mb-12" elevation="0"
+                    ><v-card-text class="px-0">
+                      <v-row>
+                        <v-col cols="3" md="2" sm="2">
+                          <v-select
+                            item-text="name"
+                            item-value="last"
+                            :items="httpMethods"
+                            v-model="formField.httpMethod"
+                            label="Http Method"
+                            @change="assignHttpMethodOnChange"
+                            outlined
+                          ></v-select>
+                        </v-col>
+                        <v-col cols="12" md="6" sm="6">
+                          <v-text-field
+                            v-model="formField.url"
+                            label="Url"
+                            :rules="step.rules"
+                            outlined
+                            required
+                          ></v-text-field
+                        ></v-col>
+                        <v-col cols="3" md="3" sm="3">
+                          <v-text-field
+                            v-model="formField.basicToken"
+                            label="Basic Auth base64 token"
+                            outlined
+                          ></v-text-field
+                        ></v-col>
+                      </v-row> </v-card-text></v-card
+                ></v-flex>
+                <v-flex md4
+                  ><v-card color="grey lighten-1" elevation="0">
+                    <div v-if="formField.httpMethod !== 'GET'">
+                      <div
+                        class="static"
+                        v-bind:class="{ active: true, 'text-danger': true }"
+                        v-if="formField.jsonstr && jsonerror"
+                      >
+                        ❌ {{ jsonerror }}
+                      </div>
+                      <div
+                        v-bind:class="{ 'text-success': true }"
+                        v-if="!jsonerror"
+                      >
+                        Valid JSON ✔
+                      </div>
+                      <v-textarea
+                        background-color="amber lighten-4"
+                        color="orange orange-darken-4"
+                        no-resize
+                        rows="4"
+                        label="JSON"
+                        v-model="formField.jsonstr"
+                        ref="jsonText"
+                        placeholder="paste or type JSON here..."
+                        @change="prettyFormat(n)"
+                      ></v-textarea>
+                    </div> </v-card
+                ></v-flex>
+              </v-layout>
             </template>
             <!--display confirm -->
             <template v-if="n == 3">
@@ -224,20 +238,20 @@ export default {
     steps: [
       {
         name: "Choose Job Name",
-        rules: [v => !!v || "Required"],
-        valid: true
+        rules: [(v) => !!v || "Required"],
+        valid: true,
       },
       {
-        name: "Select Corn Schedule",
-        rules: [v => !!v || "Required"],
-        valid: true
+        name: "Select Cron Schedule",
+        rules: [(v) => !!v || "Required"],
+        valid: true,
       },
       {
         name: "Job Data ",
-        rules: [v => (v && v.length >= 4) || "Enter at least 4 characters."],
-        valid: true
+        rules: [(v) => (v && v.length >= 4) || "Enter at least 4 characters."],
+        valid: true,
       },
-      { name: "Confirm" }
+      { name: "Confirm" },
     ],
     valid: false,
     formField: {
@@ -249,11 +263,12 @@ export default {
       cron: "",
       defaultCron: { name: "Now", last: "" },
       httpMethod: "GET",
+      basicToken: "",
       url: "http://google.com",
-      jsonstr: "{}"
+      jsonstr: "{}",
     },
     jsonerror: "",
-    stepForm: []
+    stepForm: [],
   }),
   methods: {
     stepComplete(step) {
@@ -284,7 +299,7 @@ export default {
         defaultCron: { name: "Now", last: "" },
         httpMethod: "GET",
         url: "http://google.com",
-        jsonstr: "{}"
+        jsonstr: "{}",
       };
       console.log(this.formField.jobName);
     },
@@ -292,36 +307,36 @@ export default {
       const axiosConfig = {
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
-          "Access-Control-Allow-Origin": "*"
-        }
+          "Access-Control-Allow-Origin": "*",
+        },
       };
       this.$http
         .post(this.$constants().POST_SCHEDULE, this.formField.jsonstr, {
           params: {
             jobName: this.formField.jobName,
             jobScheduleTime: this.formField.date + " " + this.formField.time,
-            cronExpression: this.formField.cron
+            cronExpression: this.formField.cron,
           },
           headers: {
             "Content-Type": "application/json;charset=UTF-8",
-            "Access-Control-Allow-Origin": "*"
-          }
+            "Access-Control-Allow-Origin": "*",
+          },
         })
         .then(
-          result => {
+          (result) => {
             console.log(result.data);
             this.$notify({
               type: "success",
               title: "<h2>Success!</h2>",
-              text: "<h3>Done ✅</h3>"
+              text: "<h3>Done ✅</h3>",
             });
           },
-          error => {
+          (error) => {
             console.log(error);
             this.$notify({
               type: "error",
               title: "<h2>Error!</h2>",
-              text: "</h3>Process Failed ❌</h3>"
+              text: "</h3>Process Failed ❌</h3>",
             });
           }
         );
@@ -329,16 +344,16 @@ export default {
     validateJobName() {
       this.$http
         .get(this.$constants().GET_JOB_NAME, {
-          params: { jobName: this.formField.jobName }
+          params: { jobName: this.formField.jobName },
         })
         .then(
-          result => {
+          (result) => {
             console.log(result.data);
             if (result.data.data == true) {
               this.$notify({
                 type: "warn",
                 title: "<h2>Already Exists ❌</h2>",
-                message: "Job Name already exists!"
+                message: "Job Name already exists!",
               });
               console.log(process.env.BASE_URL);
               this.formField.jobName =
@@ -347,11 +362,11 @@ export default {
               this.$notify({
                 type: "important",
                 title: "<h2>Good to choose ✅ </h2>",
-                text: ""
+                text: "",
               });
             }
           },
-          error => {
+          (error) => {
             console.log(error);
           }
         );
@@ -408,58 +423,58 @@ export default {
         return "";
       }
       return JSON.stringify(jsonValue, null, 2);
-    }
+    },
   },
   computed: {
     cronItems() {
       return [
         {
           name: "Now",
-          last: ""
+          last: "",
         },
         {
           name: "Every 1 minutes",
-          last: "0 0/1 * 1/1 * ? *"
+          last: "0 0/1 * 1/1 * ? *",
         },
         {
           name: "Every day at 10 AM",
-          last: "0 0 10 1/1 * ? *"
+          last: "0 0 10 1/1 * ? *",
         },
         {
           name: "Every hour starting 10 AM",
-          last: "0 0 0/1 1/1 * ? *"
+          last: "0 0 0/1 1/1 * ? *",
         },
         {
           name: "Every week Tue and Thur at 10 AM",
-          last: "0 0 10 ? * TUE,THU *"
-        }
+          last: "0 0 10 ? * TUE,THU *",
+        },
       ];
     },
     httpMethods() {
       return [
         {
           name: "GET",
-          last: "GET"
+          last: "GET",
         },
         {
           name: "PUT",
-          last: "PUT"
+          last: "PUT",
         },
         {
           name: "PATCH",
-          last: "PATCH"
+          last: "PATCH",
         },
         {
           name: "POST",
-          last: "POST"
+          last: "POST",
         },
         {
           name: "DELETE",
-          last: "DELETE"
-        }
+          last: "DELETE",
+        },
       ];
-    }
-  }
+    },
+  },
 };
 </script>
 
