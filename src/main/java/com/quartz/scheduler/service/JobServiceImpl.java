@@ -17,6 +17,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityNotFoundException;
+
 import static com.quartz.scheduler.util.SchedulerUtil.Constants.*;
 
 @Service

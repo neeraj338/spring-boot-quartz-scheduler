@@ -1,0 +1,17 @@
+server:
+  port: 4567
+spring:
+  application:
+    name: Scheduledemo
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    password: ${DB_PASSWORD:postgres}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:scheduledemo}
+    username: ${DB_USERNAME:postgres}
+    validationQuery: SELECT 1
+  jpa:
+    database: POSTGRESQL
+    generate-ddl: true
+    hibernate:
+      ddl-auto: none
+    show-sql: true

@@ -26,6 +26,7 @@ dependencies {
     def swaggerSpringDoc = "1.2.32"
     def jaxbApiVersion = "2.3.1"
     def jodaTimeVersion = "2.9.4"
+    def springRetry = "1.0.0.RELEASE"
 
     implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-web"
@@ -33,11 +34,13 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework:spring-context-support"
     implementation "org.postgresql:postgresql:$postgresDriverVersion"
+    implementation (group: 'org.springframework.retry', name: 'spring-retry')
     implementation (group: 'org.quartz-scheduler', name: 'quartz', version: "$quartzVersion")
     implementation (group: 'org.quartz-scheduler', name: 'quartz-jobs', version: "$quartzVersion")
     implementation (group: 'joda-time', name: 'joda-time', version: "$jodaTimeVersion")
     implementation (group: 'javax.xml.bind', name: 'jaxb-api', version: "$jaxbApiVersion")
     implementation (group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "$swaggerSpringDoc")
+
 
 
 

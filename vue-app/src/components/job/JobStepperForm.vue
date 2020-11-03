@@ -164,7 +164,7 @@
                         ></v-col>
                         <v-col cols="3" md="3" sm="3">
                           <v-text-field
-                            v-model="formField.basicToken"
+                            v-model="formField.basicAuthToken"
                             label="Basic Auth base64 token"
                             outlined
                           ></v-text-field
@@ -263,7 +263,7 @@ export default {
       cron: "",
       defaultCron: { name: "Now", last: "" },
       httpMethod: "GET",
-      basicToken: "",
+      basicAuthToken: "",
       url: "http://google.com",
       jsonstr: "{}",
     },
@@ -299,27 +299,21 @@ export default {
         defaultCron: { name: "Now", last: "" },
         httpMethod: "GET",
         url: "http://google.com",
+        basicAuthToken: "",
         jsonstr: "{}",
       };
       console.log(this.formField.jobName);
     },
     createJob() {
-      const axiosConfig = {
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-          "Access-Control-Allow-Origin": "*",
-        },
-      };
       this.$http
         .post(this.$constants().POST_SCHEDULE, this.formField.jsonstr, {
           params: {
             jobName: this.formField.jobName,
             jobScheduleTime: this.formField.date + " " + this.formField.time,
             cronExpression: this.formField.cron,
-          },
-          headers: {
-            "Content-Type": "application/json;charset=UTF-8",
-            "Access-Control-Allow-Origin": "*",
+            httpMethod: this.formField.httpMethod,
+            url: this.formField.url,
+            basicAuthToken: this.formField.basicAuthToken,
           },
         })
         .then(
@@ -333,11 +327,6 @@ export default {
           },
           (error) => {
             console.log(error);
-            this.$notify({
-              type: "error",
-              title: "<h2>Error!</h2>",
-              text: "</h3>Process Failed ❌</h3>",
-            });
           }
         );
     },

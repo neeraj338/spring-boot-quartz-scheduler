@@ -9,15 +9,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.quartz.scheduler.dto.JobState;
 import com.quartz.scheduler.dto.ServerResponse;
 import com.quartz.scheduler.job.CronJob;
-import com.quartz.scheduler.job.SimpleJob;
+import com.quartz.scheduler.job.OneTimeJob;
 import com.quartz.scheduler.service.JobService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import static com.quartz.scheduler.util.SchedulerUtil.Constants.*;
 import com.quartz.scheduler.util.ServerResponseCode;
+
+import javax.persistence.EntityNotFoundException;
 
 
 @RestController
@@ -32,18 +35,23 @@ public class JobController {
 	private JobService jobService;
 
 	@PostMapping(value = "/post-test", consumes = {MediaType.ALL_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void scheduleTest(@RequestBody JsonNode node){
+	public void scheduleTest(){
 		log.info("****** testing rocks  ***");
-		log.info("json string is  {}", node.toPrettyString());
+		log.info("json string is  {}");
 	}
 
 	@PostMapping(value = "schedule", consumes = {MediaType.ALL_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ServerResponse schedule(@RequestParam("jobName") String jobName,
-								   @RequestParam("jobScheduleTime") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date jobScheduleTime,
-								   @RequestParam(value = "cronExpression", required = false) String cronExpression,
-								   @RequestBody(required = false) JsonNode node){
+	public ServerResponse schedule(@RequestParam(value = JOB_NAME_REQ_PARAM) String jobName,
+								   @RequestParam(value = JOB_SCHEDULE_TIME) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date jobScheduleTime,
+								   @RequestParam(value = JOB_CRON_EXP_REQ_PARAM, required = false) String cronExpression,
+								   @RequestParam(value = HTTP_URL_ENDPOINT) String url,
+								   @RequestParam(value = HTTP_METHOD, defaultValue = "GET") HttpMethod httpMethod,
+								   @RequestParam(value = BASIC_AUTH_TOKEN, required = false) String basicAuthToken,
+								   @RequestBody(required = false) JsonNode jsonBody){
 		log.info("JobController.schedule()");
-		Map<String, Object> jobData = buildJobData(jobName, cronExpression, node);
+		Map<String, Object> jobData = buildJobData(jobName, url
+				, httpMethod, basicAuthToken, cronExpression, jobScheduleTime, jsonBody);
+
 		//Job Name is mandatory
 		if(jobName == null || jobName.trim().equals("")){
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);
@@ -54,7 +62,7 @@ public class JobController {
 
 			if(cronExpression == null || cronExpression.trim().equals("")){
 				//Single Trigger
-				boolean status = jobService.scheduleOneTimeJob(jobName, SimpleJob.class, jobScheduleTime, jobData);
+				boolean status = jobService.scheduleOneTimeJob(jobName, OneTimeJob.class, jobScheduleTime, jobData);
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs());
 				}else{
@@ -75,6 +83,21 @@ public class JobController {
 		}
 	}
 
+	private Map<String, Object> buildJobData(String jobName, String url, HttpMethod httpMethod,
+											 String basicAuthToken,
+											 String cronExpression, Date jobScheduleTime,
+											 JsonNode jsonBody) {
+		Map<String, Object> jobData = new HashMap<>();
+		jobData.put(JOB_NAME_REQ_PARAM, jobName);
+		jobData.put(JOB_CRON_EXP_REQ_PARAM, cronExpression);
+		jobData.put(JOB_REQ_BODY, jsonBody.toPrettyString());
+		jobData.put(HTTP_URL_ENDPOINT, url);
+		jobData.put(HTTP_METHOD, httpMethod.toString());
+		jobData.put(BASIC_AUTH_TOKEN, basicAuthToken);
+		jobData.put(JOB_SCHEDULE_TIME, jobScheduleTime.toString());
+
+		return jobData;
+	}
 
 
 	@PatchMapping("un-schedule")
@@ -295,11 +318,4 @@ public class JobController {
 		return serverResponse; 
 	}
 
-	private Map<String, Object> buildJobData(String jobName, String cronExpression, JsonNode node) {
-		Map<String, Object> jobData = new HashMap<>();
-		jobData.put(JOB_NAME_REQ_PARAM, jobName);
-		jobData.put(JOB_CRON_EXP_REQ_PARAM, cronExpression);
-		jobData.put(JOB_REQ_BODY, node.toPrettyString());
-		return jobData;
-	}
 }

@@ -14,9 +14,14 @@ import java.util.function.Predicate;
 public class SchedulerUtil {
 
     public static class Constants {
+        public static final String JOB_SCHEDULE_TIME = "jobScheduleTime";
         public static final String JOB_NAME_REQ_PARAM = "jobName";
         public static final String JOB_CRON_EXP_REQ_PARAM = "cronExpression";
         public static final String JOB_REQ_BODY = "jsonBody";
+        public static final String HTTP_METHOD = "httpMethod";
+        public static final String HTTP_URL_ENDPOINT = "url";
+        public static final String BASIC_AUTH_TOKEN = "basicAuthToken";
+
     }
 
     public static boolean isNotNullObjects(Object... objects) {
@@ -61,7 +66,7 @@ public class SchedulerUtil {
     public static ObjectNode createErrorJsonNode(HttpStatus status, String uri, String message) {
         ObjectNode jsonNode = createJsonNode();
         jsonNode.putPOJO("timestamp", new Date());
-        jsonNode.put("status", status.value());
+        jsonNode.put("statusCode", status.value());
         jsonNode.putPOJO("error", status.getReasonPhrase());
         jsonNode.put("path", uri);
         jsonNode.put("message", message);
@@ -72,7 +77,7 @@ public class SchedulerUtil {
     public static ObjectNode createErrorJsonNode(HttpStatus status, String uri, Map<String, ObjectNode> messageMap) {
         ObjectNode jsonNode = createJsonNode();
         jsonNode.putPOJO("timestamp", new Date());
-        jsonNode.put("status", status.value());
+        jsonNode.put("statusCode", status.value());
         jsonNode.putPOJO("error", status.getReasonPhrase());
         jsonNode.put("path", uri);
 
