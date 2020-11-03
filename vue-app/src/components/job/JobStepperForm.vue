@@ -295,7 +295,7 @@ export default {
         date: new Date().toISOString().substr(0, 10),
         time: "00:00",
         timeModel: false,
-        cron: "0 0/1 * 1/1 * ? *",
+        cron: "",
         defaultCron: { name: "Now", last: "" },
         httpMethod: "GET",
         url: "http://google.com",

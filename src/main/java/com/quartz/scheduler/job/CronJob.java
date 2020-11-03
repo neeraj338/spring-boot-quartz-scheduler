@@ -2,11 +2,7 @@ package com.quartz.scheduler.job;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import com.quartz.scheduler.service.HttpClient;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.InterruptableJob;
@@ -17,13 +13,10 @@ import org.quartz.JobKey;
 import org.quartz.UnableToInterruptJobException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import com.quartz.scheduler.service.JobService;
-import org.springframework.web.client.RestTemplate;
 import static com.quartz.scheduler.util.SchedulerUtil.Constants.*;
 
 @Slf4j

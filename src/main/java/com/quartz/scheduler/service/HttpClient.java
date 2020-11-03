@@ -1,16 +1,12 @@
 package com.quartz.scheduler.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Lookup;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -18,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import static com.quartz.scheduler.util.SchedulerUtil.Constants.*;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
 
 @Service
@@ -38,22 +37,22 @@ public class HttpClient {
                     .readTree(jsonBody.toString()) : null;
             String basicAuthToken = jobData.getOrDefault(BASIC_AUTH_TOKEN,"").toString();
             restTemplate().exchange(url, httpMethod
-                    , getHttpHeader(node, basicAuthToken), Object.class);
-        } catch (Exception e) {
-            log.error("Error attempting http call {}", ExceptionUtils.getStackTrace(e));
+                    , buildEntity(node, basicAuthToken), String.class);
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
     @Recover
     public void getBackendResponseFallback(RuntimeException e) {
-        log.info("Recovery - Returning finished .");
+        log.warn("Recovery - Returning finished .");
+        log.error("Error attempting http call {}", ExceptionUtils.getStackTrace(e));
         return ;
     }
 
-    private static <T> HttpEntity<?> getHttpHeader(T requestObject, String basicAuthToken) {
+    private static <T> HttpEntity<?> buildEntity(T requestObject, String basicAuthToken) {
 
-        HttpHeaders headers = getHttpHeader(basicAuthToken);
+        HttpHeaders headers = buildHeader(basicAuthToken);
         if(requestObject == null){
             return new HttpEntity<>(headers);
         }
@@ -61,9 +60,10 @@ public class HttpClient {
         return new HttpEntity<>(requestObject, headers);
     }
 
-    private static HttpHeaders getHttpHeader(String basicAuthToken) {
+    private static HttpHeaders buildHeader(String basicAuthToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAcceptCharset(Arrays.asList(StandardCharsets.ISO_8859_1, StandardCharsets.UTF_8, StandardCharsets.UTF_16));
         if(basicAuthToken != null && !basicAuthToken.trim().isEmpty()){
             headers.setBasicAuth(basicAuthToken);
         }

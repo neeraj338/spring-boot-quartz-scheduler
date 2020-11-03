@@ -285,8 +285,6 @@ public class JobServiceImpl implements JobService{
 					}
 
 					list.add(map);
-					log.info("***** Job details *****");
-					log.info("Job Name: {}, Group Name:{}, Schedule Time:{}",jobName, groupName ,scheduleTime);
 				}
 
 			}
