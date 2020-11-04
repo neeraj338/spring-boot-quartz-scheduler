@@ -116,6 +116,7 @@ export default Vue.extend({
               title: "<h2>Done ✅</h2>",
               message: "Updated Successfully !",
             });
+            this.$emit("reFetchJobs");
           },
           (error) => {
             console.log(error);

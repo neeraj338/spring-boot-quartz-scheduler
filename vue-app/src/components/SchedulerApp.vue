@@ -1,7 +1,7 @@
 <template>
   <v-container>
-    <job-stepper-form></job-stepper-form>
-    <jobs-data-table></jobs-data-table>
+    <job-stepper-form @reFetchJobs="reFetchJobs"></job-stepper-form>
+    <jobs-data-table :isReFetchJobs="rand"></jobs-data-table>
   </v-container>
 </template>
 
@@ -19,9 +19,15 @@ export default Vue.extend({
     JobsDataTable,
   },
 
-  data: () => ({}),
+  data: () => ({
+    rand: 0,
+  }),
 
-  methods: {},
+  methods: {
+    reFetchJobs() {
+      this.rand = Math.random() * 10000000000;
+    },
+  },
   computed: {},
 });
 </script>

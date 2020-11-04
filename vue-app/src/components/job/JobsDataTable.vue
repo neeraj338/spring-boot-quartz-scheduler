@@ -4,6 +4,7 @@
       :show="showModal"
       :editItem="editJobItem"
       @close="showModal = false"
+      @reFetchJobs="fetchJobs"
     />
     <v-data-table
       class="elevation-1"
@@ -117,6 +118,7 @@ import modal from "@/components/job/JobEditModal";
 
 export default Vue.extend({
   name: "JobsDataTable",
+  props: ["isReFetchJobs"],
   components: {
     modal,
   },
@@ -218,6 +220,7 @@ export default Vue.extend({
         .then(
           (result) => {
             console.log(result.data);
+            this.fetchJobs();
           },
           (error) => {
             console.log(error);
@@ -237,6 +240,7 @@ export default Vue.extend({
         .then(
           (result) => {
             console.log(result.data);
+            this.fetchJobs();
           },
           (error) => {
             console.log(error);
@@ -256,6 +260,7 @@ export default Vue.extend({
         .then(
           (result) => {
             console.log(result.data);
+            this.fetchJobs();
           },
           (error) => {
             console.log(error);
@@ -275,6 +280,7 @@ export default Vue.extend({
         .then(
           (result) => {
             console.log(result.data);
+            this.fetchJobs();
           },
           (error) => {
             console.log(error);
@@ -290,6 +296,7 @@ export default Vue.extend({
         .then(
           (result) => {
             console.log(result.data);
+            this.fetchJobs();
           },
           (error) => {
             console.log(error);
@@ -299,6 +306,11 @@ export default Vue.extend({
     rowClass(item) {
       console.log(item);
       return "ma-xs-2";
+    },
+  },
+  watch: {
+    isReFetchJobs: function(val) {
+      this.fetchJobs();
     },
   },
 });

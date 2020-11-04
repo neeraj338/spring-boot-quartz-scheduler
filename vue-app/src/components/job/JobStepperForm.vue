@@ -324,6 +324,7 @@ export default {
               title: "<h2>Success!</h2>",
               text: "<h3>Done ✅</h3>",
             });
+            this.$emit("reFetchJobs");
           },
           (error) => {
             console.log(error);
