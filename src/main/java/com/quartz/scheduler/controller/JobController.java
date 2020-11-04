@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import static com.quartz.scheduler.util.SchedulerUtil.Constants.*;
 import com.quartz.scheduler.util.ServerResponseCode;
 
-import javax.persistence.EntityNotFoundException;
 
 
 @RestController
@@ -101,13 +100,13 @@ public class JobController {
 
 
 	@PatchMapping("un-schedule")
-	public void unschedule(@RequestParam("jobName") String jobName) {
+	public void unschedule(@RequestParam(value = JOB_NAME_REQ_PARAM) String jobName) {
 		log.info("JobController.unschedule()");
 		jobService.unScheduleJob(jobName);
 	}
 
 	@DeleteMapping("delete")
-	public ServerResponse delete(@RequestParam("jobName") String jobName) {
+	public ServerResponse delete(@RequestParam(value = JOB_NAME_REQ_PARAM) String jobName) {
 		log.info("JobController.delete()");
 
 		if(jobService.isJobWithNamePresent(jobName)){
@@ -130,7 +129,7 @@ public class JobController {
 	}
 
 	@PatchMapping("pause")
-	public ServerResponse pause(@RequestParam("jobName") String jobName) {
+	public ServerResponse pause(@RequestParam(value = JOB_NAME_REQ_PARAM) String jobName) {
 		log.info("JobController.pause()");
 
 		if(jobService.isJobWithNamePresent(jobName)){
@@ -155,7 +154,7 @@ public class JobController {
 	}
 
 	@PatchMapping("resume")
-	public ServerResponse resume(@RequestParam("jobName") String jobName) {
+	public ServerResponse resume(@RequestParam(value = JOB_NAME_REQ_PARAM) String jobName) {
 		log.info("JobController.resume()");
 
 		if(jobService.isJobWithNamePresent(jobName)){
@@ -180,10 +179,10 @@ public class JobController {
 		}
 	}
 
-	@PutMapping("update")
-	public ServerResponse updateJob(@RequestParam("jobName") String jobName, 
-			@RequestParam("jobScheduleTime") @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm") Date jobScheduleTime, 
-			@RequestParam("cronExpression") String cronExpression){
+	@PutMapping(value = "update")
+	public ServerResponse update(@RequestParam(value = JOB_NAME_REQ_PARAM) String jobName,
+			@RequestParam(value = JOB_SCHEDULE_TIME) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date jobScheduleTime,
+			@RequestParam(value = JOB_CRON_EXP_REQ_PARAM) String cronExpression){
 		log.info("JobController.updateJob()");
 
 		//Job Name is mandatory
@@ -228,7 +227,7 @@ public class JobController {
 	}
 
 	@GetMapping("checkJobName")
-	public ServerResponse checkJobName(@RequestParam("jobName") String jobName){
+	public ServerResponse checkJobName(@RequestParam(value = JOB_NAME_REQ_PARAM) String jobName){
 		log.info("JobController.checkJobName()");
 
 		//Job Name is mandatory
@@ -241,7 +240,7 @@ public class JobController {
 	}
 
 	@GetMapping("isJobRunning")
-	public ServerResponse isJobRunning(@RequestParam("jobName") String jobName) {
+	public ServerResponse isJobRunning(@RequestParam(value = JOB_NAME_REQ_PARAM) String jobName) {
 		log.info("JobController.isJobRunning()");
 
 		boolean status = jobService.isJobRunning(jobName);
@@ -249,7 +248,7 @@ public class JobController {
 	}
 
 	@GetMapping("jobState")
-	public ServerResponse getJobState(@RequestParam("jobName") String jobName) {
+	public ServerResponse getJobState(@RequestParam(value = JOB_NAME_REQ_PARAM) String jobName) {
 		log.info("JobController.getJobState()");
 
 		JobState jobState = jobService.getJobState(jobName);
@@ -257,7 +256,7 @@ public class JobController {
 	}
 
 	@PatchMapping("stop")
-	public ServerResponse stopJob(@RequestParam("jobName") String jobName) {
+	public ServerResponse stopJob(@RequestParam(value = JOB_NAME_REQ_PARAM) String jobName) {
 		log.info("JobController.stopJob()");
 
 		if(jobService.isJobWithNamePresent(jobName)){
@@ -283,7 +282,7 @@ public class JobController {
 	}
 
 	@PatchMapping("start")
-	public ServerResponse startJobNow(@RequestParam("jobName") String jobName) {
+	public ServerResponse startJobNow(@RequestParam(value = JOB_NAME_REQ_PARAM) String jobName) {
 		log.info("JobController.startJobNow()");
 
 		if(jobService.isJobWithNamePresent(jobName)){

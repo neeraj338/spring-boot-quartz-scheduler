@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.http.*;
 import org.springframework.retry.annotation.Backoff;
@@ -29,8 +30,8 @@ public class HttpClient {
         return null;
     }
 
-    @Retryable(maxAttempts = 3,value=RuntimeException.class,backoff = @Backoff(delay = 10000, multiplier=2))
-    public void exchange(String url, HttpMethod httpMethod, Map<String, Object> jobData){
+    @Retryable(maxAttempts = 3,value=JobExecutionException.class,backoff = @Backoff(delay = 10000, multiplier=2))
+    public void exchange(String url, HttpMethod httpMethod, Map<String, Object> jobData) throws RuntimeException {
         try {
             Object jsonBody = jobData.get(JOB_REQ_BODY);
             ObjectNode node = null != jsonBody ? (ObjectNode)new ObjectMapper()
@@ -47,7 +48,7 @@ public class HttpClient {
     public void getBackendResponseFallback(RuntimeException e) {
         log.warn("Recovery - Returning finished .");
         log.error("Error attempting http call {}", ExceptionUtils.getStackTrace(e));
-        return ;
+        throw e ;
     }
 
     private static <T> HttpEntity<?> buildEntity(T requestObject, String basicAuthToken) {

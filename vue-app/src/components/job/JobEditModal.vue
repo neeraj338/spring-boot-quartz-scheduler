@@ -7,12 +7,65 @@
       <div class="modal-header text-right"></div>
       <div class="modal-body">
         <v-text-field
-          v-model="editItem.cron"
+          v-model="cron"
           :counter="10"
           label="New Cron"
           outlined
-          required
         ></v-text-field>
+        <div>
+          <!-- date time -->
+          <v-menu
+            v-model="dateMenu"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            offset-y
+            min-width="290px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="date"
+                label="Pick date"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="date"
+              @input="dateMenu = false"
+            ></v-date-picker>
+          </v-menu>
+
+          <v-dialog
+            ref="dialog"
+            v-model="timeModel"
+            :return-value.sync="time"
+            persistent
+            width="290px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="time"
+                label="Pick time"
+                prepend-icon="mdi-clock-time-four-outline"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-time-picker v-if="timeModel" v-model="time" full-width>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="timeModel = false">
+                Cancel
+              </v-btn>
+              <v-btn text color="primary" @click="setTime(time)">
+                OK
+              </v-btn>
+            </v-time-picker>
+          </v-dialog>
+        </div>
       </div>
       <div class="modal-footer text-right">
         <v-btn color="red" fab dark x-small @click="close">
@@ -31,13 +84,50 @@ import Vue from "vue";
 export default Vue.extend({
   name: "JobEditModal",
   props: ["show", "editItem"],
+  data: () => ({
+    cron: "",
+    dateMenu: false,
+    date: new Date().toISOString().substr(0, 10),
+    time: "00:00",
+    timeModel: false,
+  }),
   methods: {
     saveSchedule: function() {
       // Some save logic goes here...
-      this.close();
+
+      this.$http
+        .put(
+          this.$constants().EDIT_JOB,
+          {},
+          {
+            params: {
+              jobName: this.editItem.jobName,
+              jobScheduleTime: this.date + " " + this.time,
+              cronExpression: this.cron,
+            },
+          }
+        )
+        .then(
+          (result) => {
+            console.log(result.data);
+            this.close();
+            this.$notify({
+              type: "success",
+              title: "<h2>Done ✅</h2>",
+              message: "Updated Successfully !",
+            });
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
     },
     close: function() {
       this.$emit("close");
+    },
+    setTime(time) {
+      console.log(time);
+      this.$refs.dialog.save(time);
     },
   },
   mounted: function() {

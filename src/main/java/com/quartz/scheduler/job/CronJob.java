@@ -42,8 +42,18 @@ public class CronJob extends QuartzJobBean implements InterruptableJob{
 		JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
 		String url = dataMap.get(HTTP_URL_ENDPOINT).toString();
 		HttpMethod httpMethod = HttpMethod.valueOf(dataMap.get(HTTP_METHOD).toString());
-		httpClient.exchange(url, httpMethod, dataMap);
-		log.info("Thread: {} completed successfully", Thread.currentThread().getName() );
+		try{
+			httpClient.exchange(url, httpMethod, dataMap);
+			log.info("Thread: {} completed successfully", Thread.currentThread().getName() );
+		}catch (RuntimeException ex){
+			JobExecutionException jobExecutionException = new JobExecutionException(ex);
+			// Quartz will automatically unschedule
+			// all triggers associated with this job
+			// so that it does not run again
+			//jobExecutionException.setUnscheduleAllTriggers(true);
+			throw jobExecutionException;
+		}
+
 	}
 
 	@Override

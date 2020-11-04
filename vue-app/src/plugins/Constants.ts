@@ -11,7 +11,8 @@ export default {
         STOP_JOB: `${process.env.VUE_APP_BASE_URL}/scheduler/stop`,
         PAUSE_JOB: `${process.env.VUE_APP_BASE_URL}/scheduler/pause`,
         RESUME_JOB: `${process.env.VUE_APP_BASE_URL}/scheduler/resume`,
-        DELETE_JOB: `${process.env.VUE_APP_BASE_URL}/scheduler/delete`
+        DELETE_JOB: `${process.env.VUE_APP_BASE_URL}/scheduler/delete`,
+        EDIT_JOB: `${process.env.VUE_APP_BASE_URL}/scheduler/update`,
       };
     };
   }

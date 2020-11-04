@@ -344,7 +344,6 @@ export default {
                 title: "<h2>Already Exists ❌</h2>",
                 message: "Job Name already exists!",
               });
-              console.log(process.env.BASE_URL);
               this.formField.jobName =
                 this.formField.jobName + Math.ceil(Math.random() * 10000000000);
             } else {
