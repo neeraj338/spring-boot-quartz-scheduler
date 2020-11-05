@@ -33,11 +33,6 @@ public class JobController {
 
 	private JobService jobService;
 
-	@PostMapping(value = "/post-test", consumes = {MediaType.ALL_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void scheduleTest(){
-		log.info("****** testing rocks  ***");
-		log.info("json string is  {}");
-	}
 
 	@PostMapping(value = "schedule", consumes = {MediaType.ALL_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ServerResponse schedule(@RequestParam(value = JOB_NAME_REQ_PARAM) String jobName,

@@ -87,12 +87,12 @@ test {
 
 flyway {
     def host = System.getenv("DB_HOST") ?: "localhost"
-    def databaseName = System.getenv("DB_NAME") ?: "scheduledemo"
+    def databaseName = System.getenv("DB_NAME") ?: "quartz_scheduler"
 
     url = "jdbc:postgresql://$host/$databaseName"
     user = System.getenv("DB_USERNAME") ?: "postgres"
     password = System.getenv("DB_PASSWORD") ?: "postgres"
-    locations = ["filesystem:src/main/resources/db/migration"]
+    locations = ["filesystem:src/main/resources/db/migrations"]
 }
 
 task start(type: JavaExec) {

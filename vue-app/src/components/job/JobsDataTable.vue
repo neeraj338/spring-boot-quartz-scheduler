@@ -219,7 +219,12 @@ export default Vue.extend({
         )
         .then(
           (result) => {
-            console.log(result.data);
+            this.$notify({
+              type: "success",
+              title: "<h2>Success!</h2>",
+              text: "<h3>Done ✅</h3>",
+            });
+
             this.fetchJobs();
           },
           (error) => {
@@ -239,7 +244,11 @@ export default Vue.extend({
         )
         .then(
           (result) => {
-            console.log(result.data);
+            this.$notify({
+              type: "success",
+              title: "<h2>Success!</h2>",
+              text: "<h3>Done ✅</h3>",
+            });
             this.fetchJobs();
           },
           (error) => {
@@ -259,7 +268,11 @@ export default Vue.extend({
         )
         .then(
           (result) => {
-            console.log(result.data);
+            this.$notify({
+              type: "success",
+              title: "<h2>Success!</h2>",
+              text: "<h3>Done ✅</h3>",
+            });
             this.fetchJobs();
           },
           (error) => {
@@ -279,7 +292,11 @@ export default Vue.extend({
         )
         .then(
           (result) => {
-            console.log(result.data);
+            this.$notify({
+              type: "success",
+              title: "<h2>Success!</h2>",
+              text: "<h3>Done ✅</h3>",
+            });
             this.fetchJobs();
           },
           (error) => {
@@ -295,7 +312,11 @@ export default Vue.extend({
         })
         .then(
           (result) => {
-            console.log(result.data);
+            this.$notify({
+              type: "success",
+              title: "<h2>Success!</h2>",
+              text: "<h3>Done ✅</h3>",
+            });
             this.fetchJobs();
           },
           (error) => {
