@@ -28,33 +28,91 @@ Environment variable:
 
 Quartz schema creation:
 
-    ./gradlew flywayMigrate
+    ./gradlew flywayMigrate 
+    #Note : this is alreday initialise by spring hibernate.ddl-auto: update property
     
 To build the fat JAR and run tests:
 
     ./gradlew build test
 
+Jacoco tst coverage:
+    
+    ./gradlew jacocoTestReport
+    
 Run:
 
     java -jar build/libs/spring-boot-quartz-scheduler-1.0-SNAPSHOT.jar
     OR
     ./gradlew bootRun
 
-Jacoco tst coverage:
-    
-    ./gradlew jacocoTestReport
+Docker:
 
+       docker run --name quartz_scheduler \
+           -p 8080:8080 \
+           --env DB_NAME="quartz_scheduler" \
+           --env DB_HOST="postgres" \
+           --env DB_PORT="5432" \
+           --env DB_USER_NAME="postgres" \
+           --env DB_PASSWORD="postgres" \
+           --detach \
+           needubey/quartz_scheduler
+           
+Docker-Compose:
+    
+    # YAML
+    version: '3'
+    services:
+      postgres:
+        container_name: postgres
+        image: postgres
+        environment:
+          POSTGRES_DB: ${DB_NAME:-quartz_scheduler}
+          POSTGRES_USER: ${DB_USERNAME:-postgres}
+          POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+          PGDATA: /data/postgres
+        volumes:
+          - postgres:/data/postgres
+        ports:
+          - "5432:5432"
+        networks:
+          - postgres
+        restart: unless-stopped
+    
+      quartzscheduler:
+        depends_on:
+          - "postgres"
+        container_name: quartz_scheduler
+        image: needubey/quartz_scheduler
+        environment:
+          DB_NAME: ${DB_NAME:-quartz_scheduler}
+          DB_HOST: ${DB_HOST:-postgres}
+          DB_PORT: 5432
+          DB_USERNAME: ${DB_USERNAME:-postgres}
+          DB_PASSWORD: ${DB_PASSWORD:-postgres}
+        ports:
+          - "${SCHEDULER_PORT:-8080}:8080"
+        networks:
+          - postgres
+        restart: unless-stopped
+    
+    networks:
+      postgres:
+        driver: bridge
+    
+    volumes:
+      postgres:
+    
 Urls:
 -----------------------------
-application -> http://localhost:4567/
+application -> http://localhost:8080/
 
-swagger -> http://localhost:4567/swagger-ui.html
+swagger -> http://localhost:8080/swagger-ui.html
 
 Assumptions:
 -------------------------
-- Vuejs UI project could be run separately.
+- Vue js UI project could be run separately.
 However, we can run it together by copying the vue-app/dist/ to src/main/resources/static/ folder
-- To generate the Vuejs UI build follow ==> [link to section](./vue-app/README.md)
+- To generate the Vue js UI build follow ==> [link to section](./vue-app/README.md)
 
 References:
 -----------

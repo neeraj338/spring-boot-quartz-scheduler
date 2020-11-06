@@ -1,9 +1,12 @@
 server:
-  port: 4567
+  port: 8080
 spring:
   application:
     name: Scheduledemo
   datasource:
+    initialization-mode: always
+    data:
+      - classpath:db/migrations/V1__quartz_table.sql
     driver-class-name: org.postgresql.Driver
     password: ${DB_PASSWORD:postgres}
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:quartz_scheduler}
@@ -13,5 +16,5 @@ spring:
     database: POSTGRESQL
     generate-ddl: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
