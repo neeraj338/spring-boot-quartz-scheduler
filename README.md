@@ -59,7 +59,7 @@ Docker:
            
 Docker-Compose:
     
-    # YAML
+    
     version: '3'
     services:
       postgres:
