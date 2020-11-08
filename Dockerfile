@@ -7,6 +7,7 @@ RUN cp -r vue-app/dist/ src/main/resources/static/
 
 # build backend jar
 FROM gradle:jdk8
+ENV GRADLE_USER_HOME .gradle
 WORKDIR scheduler-app
 COPY --from=ui_build scheduler-app/ .
 RUN chmod +x gradlew

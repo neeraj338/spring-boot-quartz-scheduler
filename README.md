@@ -47,8 +47,12 @@ Run:
 
 Docker:
 
+       ## build
+       docker build -t needubey/quartz_scheduler
+       
+       # RUN
        docker run --name quartz_scheduler \
-           -p 8080:8080 \
+           -p 1234:1234 \
            --env DB_NAME="quartz_scheduler" \
            --env DB_HOST="postgres" \
            --env DB_PORT="5432" \
@@ -82,6 +86,7 @@ Docker-Compose:
         depends_on:
           - "postgres"
         container_name: quartz_scheduler
+        build: .
         image: needubey/quartz_scheduler
         environment:
           DB_NAME: ${DB_NAME:-quartz_scheduler}
@@ -90,7 +95,7 @@ Docker-Compose:
           DB_USERNAME: ${DB_USERNAME:-postgres}
           DB_PASSWORD: ${DB_PASSWORD:-postgres}
         ports:
-          - "${SCHEDULER_PORT:-8080}:8080"
+          - "${SCHEDULER_PORT:-1234}:1234"
         networks:
           - postgres
         restart: unless-stopped
@@ -104,9 +109,9 @@ Docker-Compose:
     
 Urls:
 -----------------------------
-application -> http://localhost:8080/
+application -> http://localhost:1234/
 
-swagger -> http://localhost:8080/swagger-ui.html
+swagger -> http://localhost:1234/swagger-ui.html
 
 Assumptions:
 -------------------------
